@@ -19,8 +19,6 @@
 
 - include: mesos.yml
 
-#- include: hook-module.yml
-
 - include: cni-plugins.yml
   tags:
     - cni
