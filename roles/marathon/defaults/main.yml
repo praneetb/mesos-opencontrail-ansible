@@ -1,0 +1,5 @@
+---
+
+mesosphere_apt_url: "http://repos.mesosphere.com/{{ ansible_distribution | lower }}"
+
+marathon_zookeeper_hostnames: "{{ groups['masters'][0] }}:{{ zookeeper_client_port }}"

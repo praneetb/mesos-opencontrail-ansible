@@ -1,0 +1,65 @@
+---
+ 
+- name: Address resolution
+  hosts: all
+  become: yes
+  tasks:
+    - name: Set hostname
+      hostname:
+      args:
+        name: "{{ inventory_hostname }}"
+    - name: Add entries to /etc/hosts
+      lineinfile:
+      args:
+        dest: /etc/hosts
+        regexp: " {{ item }}"
+        line: "{{ hostvars[item].ansible_ssh_host }} {{ item }}"
+      with_items: "{{ groups['all'] }}"
+  tags:
+    - resolution
+    - common
+
+- name: Common
+  hosts: cluster
+  become: yes
+  roles:
+    - pre-ansible
+    - common
+    - docker
+  tags:
+    - docker
+    - common
+
+- name: Install opencontrail
+  hosts: contrail
+  become: yes
+  roles:
+    - { role: contrail-3  }
+  tags:
+    - contrail
+
+- name: Mesos
+  hosts: masters nodes marathon
+  become: yes
+  vars:
+    mesos_zookeeper_hostnames: "{{ groups.mesos | join(':' + zookeeper_client_port + ',') }}:{{ zookeeper_client_port }}"
+  roles:
+    - { role: mesos }
+  tags: mesos
+
+- name: Marathon
+  hosts: marathon
+  vars:
+    marathon_zookeeper_hostnames: "{{ groups.marathon | join(':' + zookeeper_client_port + ',') }}:{{ zookeeper_client_port }}"
+  become: yes
+  roles:
+    - { role: marathon }
+  tags: marathon
+
+#- name: Install packnet
+#  hosts: gateways nodes
+#  become: yes
+#  roles:
+#    - { role: packnet }
+#  tags:
+#    - packnet

@@ -1,0 +1,11 @@
+---
+
+- name: restart contrail-vrouter-agent
+  service: name=contrail-vrouter-agent state=restarted
+
+- name: restart contrail-control
+  service: name=contrail-control state=restarted
+
+- name: restart contrail-analytics
+  service: name=contrail-analytics state=restarted
+

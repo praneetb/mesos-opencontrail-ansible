@@ -1,0 +1,21 @@
+{
+	"name": "opencontrail",
+	"type": "cni-contrail-plugin",
+	"opencontrail_server": "{{ groups['masters'][0] }}",
+	"opencontrail_port": 8082,
+	"public_subnet": "{{ contrail_public_subnet }}",
+	"private_subnet": "{{ contrail_private_subnet }}",
+	"service_subnet": "{{ contrail_service_subnet }}",
+	"contrail_cli_cmd": "python",
+	"contrail_cli_args": [
+		"{{ mesos_cni_plugins_dir }}/contrail_cli.py"
+	],
+	"vrouter_ctl_cmd": "docker",
+	"vrouter_ctl_args": [
+		"exec", "contrail-vrouter-agent", "python", "/vrouter_ctl.py"
+	],
+	"ipam": {
+		"type": "host-local",
+		"subnet": "{{ contrail_private_subnet }}"
+	}
+}

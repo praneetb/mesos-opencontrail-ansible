@@ -1,0 +1,20 @@
+# Must be a string due to usage in concatenation with other stings
+zookeeper_client_port: "2181"
+
+contrail_service_subnet: "{{ service_subnet | default('10.64.0.0/16') }}"
+
+# External network
+contrail_public_subnet: "{{ public_subnet | default('172.18.0.0/20') }}"
+
+# Underlay network
+contrail_private_subnet: "{{ private_subnet | default('10.32.0.0/16') }}"
+
+# Binaries and packages will be downloaded from this server
+private_file_server: "ec2-54-229-74-189.eu-west-1.compute.amazonaws.com"
+
+# hosts that nodes should know to avoid fingerprint checking
+tmp_known_hosts_file: "tmp_known_hosts_file"
+tmp_known_hosts_file_dest: "/tmp/tmp_known_hosts_file"
+
+networking: "opencontrail"
+kube_service_addresses: 

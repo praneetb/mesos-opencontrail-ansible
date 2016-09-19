@@ -1,0 +1,6 @@
+---
+opencontrail_cluster_services_namespace: mesos-system
+
+ifmap_basic_port: 8443
+ifmap_cert_port: 8444
+

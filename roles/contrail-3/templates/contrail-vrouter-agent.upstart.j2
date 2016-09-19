@@ -1,0 +1,18 @@
+description "OpenContrail VRouter agent"
+
+start on started docker.io
+stop on runlevel [!2345]
+
+respawn
+
+pre-start script
+	/usr/bin/docker rm contrail-vrouter-agent || echo "ignore error"
+end script
+
+post-stop script
+	/usr/bin/docker kill contrail-vrouter-agent
+end script
+
+script
+        /usr/bin/docker run --name contrail-vrouter-agent -v "{{ vrouter_ctl_path }}:/vrouter_ctl.py" -v "{{ contrail_log_dir }}:/var/log/contrail" -v /usr/src:/usr/src  -v /lib/modules:/lib/modules --privileged=true --cap-add=AUDIT_WRITE --pid=host --net=host -e CLOUD_ORCHESTRATOR=kubernetes -e DISCOVERY_SERVER={{ contrail_master_host_addresses }} -e CONFIG_IP={{ contrail_master_host_address }} -e VROUTER_PHYSICAL_INTERFACE={{ contrail_host_interface }} contrail-agent-liberty:3.1.1.0-29
+end script

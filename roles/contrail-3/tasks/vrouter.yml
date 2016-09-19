@@ -1,0 +1,33 @@
+---
+
+- name: Download vrouter_ctl
+  get_url: url="{{ vrouter_ctl_url }}" dest="{{ vrouter_ctl_path }}"
+
+- name: VRouter agent upstart
+  template:
+    src: contrail-vrouter-agent.upstart.j2
+    dest: /etc/init/contrail-vrouter-agent.conf
+    mode: 0644
+  notify:
+    - restart contrail-vrouter-agent
+
+- name: Copy image
+  become: no
+  shell: scp -o UserKnownHostsFile="{{ tmp_known_hosts_file_dest }}" "{{ private_file_server }}:{{ contrail_images_path }}/{{ item }}" /tmp/
+  with_items:
+    - "{{ contrail_agent_image }}"
+
+- name: Load docker images
+  shell: docker load < "/tmp/{{ item }}"
+  with_items:
+    - "{{ contrail_agent_image }}"
+
+- name: uname -r
+  shell: uname -r
+  register: uname
+
+- name: Install linux headers
+  apt: name="linux-headers-{{ uname.stdout }}" state=latest
+
+- name: Start vrouter agent
+  service: name=contrail-vrouter-agent enabled=yes state=started

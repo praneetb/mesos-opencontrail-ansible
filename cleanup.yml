@@ -1,0 +1,100 @@
+---
+- name: Node facts
+  hosts: nodes
+  tasks:
+    - set_fact:
+        host_services:
+          - contrail-vrouter-agent
+          - mesos-slave
+        log_dirs:
+          - contrail
+
+- name: Gateway facts
+  hosts: gateways
+  tasks:
+    - set_fact:
+        host_services:
+          - contrail-vrouter-agent
+        log_dirs:
+          - contrail
+
+- name: Master facts
+  hosts: masters
+  tasks:
+    - set_fact:
+        host_services:
+          - zookeeper
+          - rabbitmq
+          - cassandra
+          - etcd
+          - ifmap-server
+          - contrail-control
+          - contrail-schema
+          - contrail-api
+          - mesos-slave
+          - mesos-master
+          - marathon
+        log_dirs:
+          - mesos
+          - marathon
+          - zookeeper
+          - cassandra
+          - rabbitmq
+          - contrail
+          - ifmap-server
+
+- name: Stop all services
+  hosts: all
+  become: yes
+  tasks:
+    - name: Stop all services
+      service: name="{{ item }}" enabled=yes state=stopped
+      with_items: "{{ host_services }}"
+      ignore_errors: true
+
+- name: Remove all dockers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Remove all dockers
+      shell: "docker rm $(docker ps -a -q) || echo ''"
+      ignore_errors: true
+
+- name: Cleanup service data
+  hosts: masters
+  become: yes
+  tasks:
+    - name: Cleanup /var/lib
+      shell: "rm -rf /var/lib/{{ item }}/*"
+      with_items:
+        - etcd
+        - cassandra
+        - zookeeper
+
+- name: Cleanup logs
+  hosts: all
+  become: yes
+  tasks:
+    - name: Cleanup log dirs
+      shell: "rm -rf /var/log/{{ item }}/*"
+      with_items: "{{ log_dirs }}"
+
+- name: Start all services
+  hosts: all
+  become: yes
+  tasks:
+    - name: Start all services
+      service: name="{{ item }}" enabled=yes state=started
+      with_items: "{{ host_services }}"
+      ignore_errors: true
+
+- name: Provision opencontrail once the services are operational
+  hosts:
+    - masters[0]
+    - nodes
+  become: yes
+  roles:
+    - { role: opencontrail_facts, when: networking == 'opencontrail' }
+    - { role: opencontrail_provision, when: networking == 'opencontrail' }
+  tags:
+    - network-service-config

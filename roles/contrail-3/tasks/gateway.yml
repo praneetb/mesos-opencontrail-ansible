@@ -1,0 +1,14 @@
+---
+
+- name: Interface configuration file
+  template: src=gateway.cfg.j2 dest=/etc/network/interfaces.d/{{ item }}.cfg
+  with_items:
+    - gateway0
+    - gateway1
+
+- name: Activate gateway0
+  command: ifup gateway0
+
+- name: Activate gateway1
+  command: ifup gateway1
+

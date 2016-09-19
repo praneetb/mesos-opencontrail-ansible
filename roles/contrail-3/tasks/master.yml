@@ -1,0 +1,29 @@
+---
+
+- name: Install control-node service (upstart)
+  template: src="{{ item }}.upstart.j2" dest="/etc/init/{{ item }}.conf"
+  with_items:
+    - contrail-control
+    - contrail-analytics
+  notify:
+    - restart contrail-control
+    - restart contrail-analytics
+
+- name: Copy images to master
+  become: no
+  shell: scp -o UserKnownHostsFile="{{ tmp_known_hosts_file_dest }}" "{{ private_file_server }}:{{ contrail_images_path }}/{{ item }}" /tmp/
+  with_items:
+    - "{{ contrail_controler_image }}"
+    - "{{ contrail_analytics_image }}"
+
+- name: Load docker images
+  shell: docker load < "/tmp/{{ item }}"
+  with_items:
+    - "{{ contrail_controler_image }}"
+    - "{{ contrail_analytics_image }}"
+
+- name: Start contrail-control service
+  service: name="contrail-control" enabled=yes state=started
+
+- name: Start contrail-analytics service
+  service: name="contrail-analytics" enabled=yes state=started

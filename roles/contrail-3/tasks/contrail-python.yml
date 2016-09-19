@@ -1,0 +1,20 @@
+---
+
+- name: Install dependencies
+  apt: deb="{{ item }}" state=present
+  with_items:
+    - "{{ python_thrift_package }}"
+    - "{{ python_backports_ssl_package }}"
+    - "{{ python_certifi_package }}"
+    - "{{ python_pycassa_package }}"
+    - "{{ python_geventhttpclient_package }}"
+    - "{{ python_consistent_hash_package }}"
+
+- name: Download contrail-python
+  become: no
+  shell: scp -o UserKnownHostsFile="{{ tmp_known_hosts_file_dest }}" "{{ private_file_server }}:{{ contrail_images_path }}/{{ item }}" /tmp/
+  with_items:
+    - "{{ contrail_python_package }}"
+
+- name: Install contrail-python
+  apt: deb="/tmp/{{ contrail_python_package }}" state=present

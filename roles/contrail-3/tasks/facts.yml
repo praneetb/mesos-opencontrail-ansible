@@ -1,0 +1,17 @@
+---
+
+- name: Host IP address configuration (from physical interface)
+  include: interface_ansible_facts.yml
+  when: "'ipv4' in hostvars[inventory_hostname]['ansible_' + contrail_host_interface]"
+
+- name: Host IP address configuration (from vhost0)
+  include: vhost_ansible_facts.yml
+  when: "'ansible_vhost0' in hostvars[inventory_hostname] and 'ipv4' in ansible_vhost0"
+
+- name: Master IP list default
+  set_fact:
+    contrail_master_host_addresses: "{%for host in groups['masters']%}{{ hostvars[host]['contrail_host_address'] }} {% endfor %}"
+
+- name: First Master ipaddr default
+  set_fact:
+    contrail_master_host_address: "{{ hostvars[groups['masters'][0]]['contrail_host_address'] }}"

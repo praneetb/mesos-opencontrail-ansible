@@ -1,0 +1,59 @@
+---
+
+- name: Clone Mesos from Codilime fork
+  local_action: git dest={{mesos_local_dir}} repo={{mesos_git}} version=hooks
+  register: local_mesos_git_status
+  run_once: true
+  become: no
+
+- name: Crate a Mesos bundle
+  local_action: shell gbundle() { git bundle "$@"; }; gbundle create {{mesos_local_dir}}.bundle hooks
+  args:
+    chdir: "{{mesos_local_dir}}"
+  run_once: true
+  become: no
+
+- name: Check Mesos revision checked out
+  shell: "if [ -d {{mesos_src}}/.git ]; then cd {{mesos_src}} && git rev-parse HEAD; fi"
+  register: mesos_revision
+
+- name: Propagate Mesos bundle
+  copy: dest={{mesos_bundle}} src=/tmp/mesos.bundle force=yes
+
+- name: Unbundle Mesos repository
+  shell: if [ ! -d {{mesos_src}}/.git ]; then git clone {{mesos_bundle}} -b hooks {{mesos_src}}; else cd {{mesos_src}} && git pull {{mesos_bundle}} hooks; fi
+  when: "local_mesos_git_status.after != mesos_revision.stdout"
+
+- name: Create empty build directory
+  file: path={{mesos_src}}/build force=yes state=directory
+  register: mesos_build
+
+- name: Bootstrap Mesos
+  shell: ./bootstrap
+  args:
+    chdir: "{{mesos_src}}"
+  when: "local_mesos_git_status.after != mesos_revision.stdout or mesos_build.changed"
+
+- debug: msg="Will use {{ (ansible_processor_vcpus) | int }} jobs ..."
+
+#- debug: msg="{{ ansible_processor_cores }} {{ ansible_processor_count }} {{ ansible_processor_threads_per_core }} {{ ansible_processor_vcpus }}"
+
+- debug: msg="Build condition is -> local_mesos_git_status.after != mesos_revision.stdout => {{local_mesos_git_status.after}} != {{mesos_revision.stdout}}  ({{ ( local_mesos_git_status.after != mesos_revision.stdout ) }})"
+
+- name: Build and install Mesos
+  shell: "{{item}}"
+  args:
+    chdir: "{{mesos_src}}/build"
+  with_items:
+    - ../configure
+    - make -j {{ (ansible_processor_vcpus) | int }}
+    - make install
+  when: "local_mesos_git_status.after != mesos_revision.stdout or mesos_build.changed"
+  register: mesos_build_status
+
+- name: run ldconfig
+  action: command /sbin/ldconfig
+
+- name: Deploy init wrapper for Mesos
+  copy: dest=/usr/bin/ src=mesos-init-wrapper force=yes mode=a+x
+

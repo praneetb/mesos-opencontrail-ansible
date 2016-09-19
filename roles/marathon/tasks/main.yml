@@ -1,0 +1,79 @@
+---
+
+#- name: Add apt-key
+#  apt_key: id=E56151BF keyserver=keyserver.ubuntu.com state=present
+
+#- name: Add mesosphere repo
+#  apt_repository: repo='deb {{ mesosphere_apt_url }} {{ansible_distribution_release|lower}} main' state=present
+
+#- name: Install Debian OS packages
+#  action: apt pkg={{item}} state=latest install_recommends=no update_cache=true
+#  with_items:
+#    - marathon
+#  retries: 3
+#  delay: 5
+#  register: result
+#  until: result|success
+
+#- name: Add repo for sbt
+#  apt_repository: repo='deb https://dl.bintray.com/sbt/debian /' state=present
+
+#- name: Add apt-key for sbt
+#  apt_key: id=2EE0EA64E40A89B84B2DF73499E82A75642AC823 keyserver="hkp://keyserver.ubuntu.com:80" state=present
+
+#- name: Install sbt
+#  apt: update_cache=yes name=sbt state=latest
+
+#- name: Download Marathon
+#  git:
+#  args:
+#    repo: "https://github.com/mesosphere/marathon.git"
+#    version: "{{ marathon_version }}"
+#    dest: /usr/local/marathon
+
+#- name: Install Marathon
+#  shell: "{{ item }}"
+#  args:
+#    chdir: /usr/local/marathon
+#  with_items:
+#    - sbt assembly
+
+- name: Download marathon DEB package
+  become: no
+  shell: scp -o UserKnownHostsFile="{{ tmp_known_hosts_file_dest }}" "{{ private_file_server }}:{{ marathon_packages_path }}/{{ item }}" /tmp/
+  with_items:
+    - "{{ marathon_package_name }}"
+
+#- name: Propagate marathon DEB package
+#  copy: src="{{ marathon_package_name }}" dest="/tmp/{{ marathon_package_name }}" force=yes
+
+- name: Install Marathon
+  apt: deb=/tmp/{{ marathon_package_name }} state=present update_cache=false force=yes install_recommends=yes
+
+- name: run ldconfig
+  action: command /sbin/ldconfig
+
+- name: Create init wrapper
+  copy: dest=/usr/bin/ src=marathon-init-wrapper force=yes mode=a+x
+
+- name: Create upstart config
+  copy: src=marathon.conf dest=/etc/init/marathon.conf
+
+- name: Create config directory
+  file: path=/etc/marathon/conf state=directory
+
+- name: Configure Marathon service
+  template: src=hostname-conf.j2 dest=/etc/marathon/conf/hostname
+  notify: Restart Marathon
+
+- name: Configure Marathon service
+  template: src=zk-conf.j2 dest=/etc/marathon/conf/zk
+  notify: Restart Marathon
+
+- name: Configure Marathon service
+  template: src=master-conf.j2 dest=/etc/marathon/conf/master
+  notify: Restart Marathon
+
+- name: Configure Marathon service
+  template: src=http_port-conf.j2 dest=/etc/marathon/conf/http_port
+  notify: Restart Marathon

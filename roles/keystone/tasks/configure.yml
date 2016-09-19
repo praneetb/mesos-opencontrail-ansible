@@ -1,0 +1,61 @@
+---
+- name: ensure keystone database is present
+  mysql_db:
+    login_host: 127.0.0.1
+    login_port: "{{ openstack_mysql_port }}"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: keystone
+  register: create_keystone_db
+
+- name: ensure keystone database user is present
+  mysql_user:
+    login_host: 127.0.0.1
+    login_port: "{{ openstack_mysql_port }}"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: keystone
+    host: "{{ item }}"
+    password: "{{ openstack_mysql_keystone_password }}"
+    priv: keystone.*:ALL
+  with_items:
+    - localhost
+    - "%"
+
+- name: ensure keystone.conf is properly configured
+  become: yes
+  ini_file:
+    dest: /etc/keystone/keystone.conf
+    group: keystone
+    mode: 0640
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { section: DEFAULT, option: log_dir, value: /var/log/keystone }
+    - { section: DEFAULT, option: verbose, value: "{{ openstack_log_verbose }}" }
+    - { section: DEFAULT, option: debug, value: "{{ openstack_log_debug }}" }
+    - { section: DEFAULT,
+        option: admin_token, value: "{{ openstack_identity_admin_token }}" }
+    - { section: database, option: connection,
+        value: "mysql://keystone:{{ openstack_mysql_keystone_password }}@{{
+                  openstack_mysql_host }}:{{ openstack_mysql_port }}/keystone" }
+    - { section: token,
+        option: expiration, value: "{{ openstack_identity_token_expiration }}" }
+  register: modify_keystone_ini
+
+- name: ensure keystone database has been synced
+  become: yes
+  command: /usr/bin/keystone-manage db_sync
+  when: create_keystone_db|changed or modify_keystone_ini|changed
+
+- name: restart keystone
+  become: yes
+  service:
+    name: keystone
+    state: restarted
+
+- name: ensure keystone sqlite is deleted
+  file:
+    dest: /var/lib/keystone/keystone.sqlite
+    state: absent

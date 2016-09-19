@@ -1,0 +1,16 @@
+{
+"name": "bridge",
+"type": "bridge",
+"bridge": "mesos-cni0",
+"isGateway": true,
+"ipMasq": true,
+"hairpinMode": true,
+"ipam": {
+    "type": "host-local",
+    "subnet": "172.20.0.0/16",
+    "routes": [
+    { "dst":
+      "{{ cluster_subnet }}" }
+    ]
+  }
+}

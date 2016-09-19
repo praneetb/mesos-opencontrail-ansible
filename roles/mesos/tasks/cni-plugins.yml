@@ -1,0 +1,26 @@
+---
+
+- name: Create cni dirs
+  file: path="{{ item }}" state=directory
+  with_items:
+    - "{{mesos_cni_config_dir}}"
+    - "{{mesos_cni_plugins_dir}}"
+
+- name: Copy cni configs
+  template: src="{{ item }}.j2" dest="{{ mesos_cni_config_dir }}/{{ item }}"
+  with_items:
+    - cni-contrail.conf
+    - cni-bridge.conf
+  notify:
+    - Restart mesos-slave
+
+- name: Copy cni plugins
+  copy: src="{{ item }}" dest="{{ mesos_cni_plugins_dir }}/{{ item }}" mode=0777
+  with_items:
+    - cni-contrail-plugin
+    - contrail_cli.py
+    - ipam-opencontrail
+    - bridge
+    - host-local
+  notify:
+    - Restart mesos-slave

@@ -1,0 +1,12 @@
+# Determine the IP address information from the physical interface.
+---
+- name: IP address information (from physical interface)
+  set_fact:
+    contrail_host_address: "{{ hostvars[inventory_hostname]['ansible_' + contrail_host_interface]['ipv4']['address'] }}"
+    contrail_host_netmask: "{{ hostvars[inventory_hostname]['ansible_' + contrail_host_interface]['ipv4']['netmask'] }}"
+    contrail_host_gateway: "{{ ansible_default_ipv4.gateway if 'interface' in ansible_default_ipv4 and ansible_default_ipv4.interface == contrail_host_interface else None }}"
+
+- set_fact:
+    contrail_host_prefixlen: "{{ contrail_host_netmask | netmask2prefixlen }}"
+- set_fact:
+    contrail_host_ipaddr: "{{ [contrail_host_address, contrail_host_prefixlen] | join('/') }}"

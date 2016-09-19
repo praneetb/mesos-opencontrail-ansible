@@ -1,0 +1,44 @@
+---
+
+- name: Download google protobuf
+  git:
+  args:
+    repo: https://github.com/google/protobuf.git
+    version: v2.6.0
+    dest: /tmp/protobuf
+
+- name: Install google protobuf
+  shell: "{{ item }}"
+  args:
+    chdir: /tmp/protobuf
+  with_items:
+    - autoreconf -f -i -Wall,no-obsolete
+    - ./configure
+    - make
+#    - make check
+    - make install
+
+- name: Install libraries needed by hook module
+  apt: name="{{ item }}" state=latest
+  with_items:
+    - libboost-dev
+    - libgoogle-glog-dev
+
+- name: module json file
+  template: src=slave-hook-module.json.j2 dest="{{ slave_modules_json_path }}/slave-hook-module.json"
+
+- name: Copy hook module source file
+  copy: src=slavehookmodule.cpp dest=/tmp/slavehookmodule.cpp
+
+- name: Create directory for hook module
+  file: path=/usr/local/lib/mesos/modules state=directory
+
+- name: Compile hook module
+  shell: g++ -lmesos -std=c++11 -DPICOJSON_USE_INT64 -fpic -c -o slavehookmodule.o slavehookmodule.cpp
+  args:
+    chdir: /tmp
+
+- name: Link hook module
+  shell: gcc -shared -o "{{ slave_hook_module_path }}/libslavehookmodule.so" slavehookmodule.o
+  args:
+    chdir: /tmp

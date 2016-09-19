@@ -1,0 +1,66 @@
+---
+- name: Get os_version from /etc/os-release
+  raw: "grep '^VERSION_ID=' /etc/os-release | sed s'/VERSION_ID=//'"
+  register: os_version
+  always_run: yes
+
+- name: Get distro name from /etc/os-release
+  raw: "grep '^NAME=' /etc/os-release | sed s'/NAME=//'"
+  register: distro
+  always_run: yes
+
+# Need to do it this way explicitly
+# Using filters will try to get filter_plugins
+# which is dependent on netaddr
+- name: Install netaddr
+  local_action: apt
+  args:
+    name: python-netaddr
+    state: latest
+    force: yes
+  ignore_errors: yes
+  run_once: true
+
+- name: Install netaddr
+  local_action: yum
+  args:
+    name: python-netaddr
+    state: latest
+  ignore_errors: yes
+  run_once: true
+
+
+- name: Make sure necessary packages are installed
+  become: yes
+  local_action: "{{ ansible_pkg_mgr }}"
+  args:
+    name: "{{ item }}"
+    state: latest
+    force: yes
+    update_cache: yes
+  with_items:
+    - python-pip
+    - python-dev
+    - python-netaddr
+    - python-markupsafe
+  run_once: true
+  retries: 3
+  delay: 5
+  register: result
+  until: result|success
+
+- name: Determine if Atomic
+  stat: path=/run/ostree-booted
+  register: s
+  changed_when: false
+
+- name: Set the is_atomic fact
+  set_fact:
+    is_atomic: true
+  when: s.stat.exists
+
+- include: fedora-dnf.yml
+  when: os_version.stdout|int >= 22 and 'Fedora' in distro.stdout and is_atomic is not defined
+
+- name: Install known_hosts file
+  copy: src="{{ tmp_known_hosts_file }}" dest="/tmp/{{ tmp_known_hosts_file }}"

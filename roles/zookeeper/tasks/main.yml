@@ -1,0 +1,25 @@
+---
+- name: zookeeper directory
+  file: name=/var/lib/zookeeper state=directory
+
+- name: master services upstart files
+  template: src="{{ item }}.upstart.j2" dest="/etc/init/{{ item }}.conf"
+  with_items:
+    - zookeeper
+
+- name: Docker image ids (services)
+  command: docker images -q "{{ item }}"
+  with_items:
+    - 'mesoscloud/zookeeper:3.4.6'
+  register: image_ids
+  always_run: true
+
+- name: Pull docker images (services)
+  command: docker pull "{{ item.item }}"
+  with_items: image_ids.results
+  when: not item.stdout
+
+- name: Run zookeeper
+  service: name="{{ item }}" enabled=yes state=started
+  with_items:
+    - zookeeper
