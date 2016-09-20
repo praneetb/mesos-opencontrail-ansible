@@ -1,26 +1,53 @@
 ---
 
+- name: Install golang
+  include: golang.yml
+
+- include_vars: golang.yml
+
+- name: Download cni repo
+  git:
+  args:
+    repo: "https://github.com/containernetworking/cni.git"
+    dest: "{{ go_gopath }}/src/cni"
+
+- name: Build cni plugins
+  shell: . {{ go_profile_entry }}; ./build
+  args:
+    chdir: "{{ go_gopath }}/src/cni"
+
+- name: Download cni-opencontrail-plugin repo
+  git:
+  args:
+    repo: "https://github.com/codilime/cni-opencontrail-plugin.git"
+    dest: "{{ go_gopath }}/src/cni-opencontrail-plugin"
+
+- name: Build cni-opencontrail-plugin
+  shell: . {{ go_profile_entry }}; go get && go build cni-contrail-plugin.go
+  args:
+    chdir: "{{ go_gopath }}/src/cni-opencontrail-plugin"
+
 - name: Create cni dirs
-  file: path="{{ item }}" state=directory
+  file:
+  args:
+    path: "{{ item }}"
+    state: directory
   with_items:
     - "{{mesos_cni_config_dir}}"
     - "{{mesos_cni_plugins_dir}}"
+
+- name: Install plugins
+  shell: mv "{{ item }}" "{{ mesos_cni_plugins_dir }}"
+  with_items:
+    - "{{ go_gopath }}/src/cni/bin/bridge"
+    - "{{ go_gopath }}/src/cni/bin/host-local"
+    - "{{ go_gopath }}/src/cni-opencontrail-plugin/cni-contrail-plugin"
+    - "{{ go_gopath }}/src/cni-opencontrail-plugin/contrail_cli.py"
 
 - name: Copy cni configs
   template: src="{{ item }}.j2" dest="{{ mesos_cni_config_dir }}/{{ item }}"
   with_items:
     - cni-contrail.conf
     - cni-bridge.conf
-  notify:
-    - Restart mesos-slave
-
-- name: Copy cni plugins
-  copy: src="{{ item }}" dest="{{ mesos_cni_plugins_dir }}/{{ item }}" mode=0777
-  with_items:
-    - cni-contrail-plugin
-    - contrail_cli.py
-    - ipam-opencontrail
-    - bridge
-    - host-local
   notify:
     - Restart mesos-slave

@@ -62,5 +62,12 @@
 - include: fedora-dnf.yml
   when: os_version.stdout|int >= 22 and 'Fedora' in distro.stdout and is_atomic is not defined
 
-- name: Install known_hosts file
+- name: Copy known_hosts file
   copy: src="{{ tmp_known_hosts_file }}" dest="/tmp/{{ tmp_known_hosts_file }}"
+
+- name: Add known hosts
+  shell: cat "/tmp/{{ tmp_known_hosts_file }}" >> ~/.ssh/known_hosts
+
+- name: Add known hosts
+  become: no
+  shell: cat "/tmp/{{ tmp_known_hosts_file }}" >> ~/.ssh/known_hosts

@@ -1,0 +1,8 @@
+---
+
+go_version: 1.6
+go_download_url: https://storage.googleapis.com/golang/go{{go_version}}.linux-amd64.tar.gz
+go_download_sum: sha256:5470eac05d273c74ff8bac7bef5bad0b5abbd1c4052efbdbc8db45332e836b0b
+go_install_prefix: /usr/local
+go_profile_entry: /etc/profile.d/golang.sh
+go_gopath: /usr/local/go/gopath

@@ -1,0 +1,46 @@
+---
+
+- include_vars: golang.yml
+
+- name: Check Golang existance
+  shell: . {{ go_profile_entry }}; type go
+  register: golang_exists
+  failed_when: false
+
+- name: Check Golang version
+  shell: . {{ go_profile_entry }}; go version | cut -f 3 -d ' '
+  register: golang_version
+  when: "golang_exists.rc == 0"
+
+- name: Download Golang package
+  local_action: get_url url={{ go_download_url }} dest=/tmp checksum={{ go_download_sum }} force=no
+  when: "golang_exists.rc != 0 or golang_version.stdout != 'go{{ go_version }}'"
+
+- name: Install Golang
+  unarchive: dest={{ go_install_prefix }} src=/tmp/go{{ go_version }}.linux-amd64.tar.gz copy=yes
+  when: "golang_exists.rc != 0 or golang_version.stdout != 'go{{ go_version }}'"
+
+- name: Configure Golang environmental variables
+  lineinfile:
+  args:
+    dest: "{{ go_profile_entry }}"
+    create: yes
+    state: present
+    line: "export PATH=$PATH:{{ go_install_prefix }}/go/bin"
+    backup: yes
+  when: "golang_exists.rc != 0 or golang_version.stdout != 'go{{ go_version }}'"
+
+- name: Create GOPATH dir
+  file: path={{ go_gopath }}/{{ item }} state=directory
+  with_items:
+    - src
+    - pkg
+
+- name: Configure Golang environmental variables
+  lineinfile:
+  args:
+    dest: "{{ go_profile_entry }}"
+    create: yes
+    state: present
+    line: "export GOPATH={{ go_gopath }}"
+    backup: yes

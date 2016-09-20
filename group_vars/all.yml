@@ -11,10 +11,10 @@ contrail_private_subnet: "{{ private_subnet | default('10.32.0.0/16') }}"
 
 # Binaries and packages will be downloaded from this server
 private_file_server: "ec2-54-229-74-189.eu-west-1.compute.amazonaws.com"
+private_file_server_user: ubuntu
 
 # hosts that nodes should know to avoid fingerprint checking
 tmp_known_hosts_file: "tmp_known_hosts_file"
-tmp_known_hosts_file_dest: "/tmp/tmp_known_hosts_file"
 
 networking: "opencontrail"
 kube_service_addresses: 

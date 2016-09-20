@@ -12,7 +12,7 @@
 
 - name: Download contrail-python
   become: no
-  shell: scp -o UserKnownHostsFile="{{ tmp_known_hosts_file_dest }}" "{{ private_file_server }}:{{ contrail_images_path }}/{{ item }}" /tmp/
+  shell: scp "{{ private_file_server_user }}@{{ private_file_server }}:{{ contrail_images_path }}/{{ item }}" /tmp/
   with_items:
     - "{{ contrail_python_package }}"
 
