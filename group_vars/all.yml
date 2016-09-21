@@ -15,6 +15,3 @@ private_file_server_user: ubuntu
 
 # hosts that nodes should know to avoid fingerprint checking
 tmp_known_hosts_file: "tmp_known_hosts_file"
-
-networking: "opencontrail"
-kube_service_addresses: 
