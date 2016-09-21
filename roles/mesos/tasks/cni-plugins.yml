@@ -23,7 +23,7 @@
     dest: "{{ go_gopath }}/src/cni-opencontrail-plugin"
 
 - name: Build cni-opencontrail-plugin
-  shell: . {{ go_profile_entry }}; go get && go build cni-contrail-plugin.go
+  shell: . {{ go_profile_entry }}; go get && go build cni-opencontrail-plugin.go
   args:
     chdir: "{{ go_gopath }}/src/cni-opencontrail-plugin"
 
@@ -41,13 +41,13 @@
   with_items:
     - "{{ go_gopath }}/src/cni/bin/bridge"
     - "{{ go_gopath }}/src/cni/bin/host-local"
-    - "{{ go_gopath }}/src/cni-opencontrail-plugin/cni-contrail-plugin"
+    - "{{ go_gopath }}/src/cni-opencontrail-plugin/cni-opencontrail-plugin"
     - "{{ go_gopath }}/src/cni-opencontrail-plugin/contrail_cli.py"
 
 - name: Copy cni configs
   template: src="{{ item }}.j2" dest="{{ mesos_cni_config_dir }}/{{ item }}"
   with_items:
-    - cni-contrail.conf
-    - cni-bridge.conf
+    - cni-opencontrail-plugin.conf
+    - cni-bridge-plugin.conf
   notify:
     - Restart mesos-slave
