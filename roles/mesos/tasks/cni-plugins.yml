@@ -10,6 +10,7 @@
   args:
     repo: "https://github.com/containernetworking/cni.git"
     dest: "{{ go_gopath }}/src/cni"
+    force: yes
 
 - name: Build cni plugins
   shell: . {{ go_profile_entry }}; ./build
@@ -21,6 +22,7 @@
   args:
     repo: "https://github.com/codilime/cni-opencontrail-plugin.git"
     dest: "{{ go_gopath }}/src/cni-opencontrail-plugin"
+    force: yes
 
 - name: Build cni-opencontrail-plugin
   shell: . {{ go_profile_entry }}; go get && go build cni-opencontrail-plugin.go

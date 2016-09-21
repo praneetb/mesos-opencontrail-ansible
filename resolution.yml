@@ -1,0 +1,9 @@
+---
+
+- name: Resolution
+  hosts: all
+  become: yes
+  roles:
+    - { role: resolution }
+  tags: resolution
+

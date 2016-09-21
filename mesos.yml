@@ -1,0 +1,11 @@
+---
+
+- name: Mesos
+  hosts: masters nodes
+  become: yes
+  vars:
+    mesos_zookeeper_hostnames: "{{ groups.masters | join(':' + zookeeper_client_port + ',') }}:{{ zookeeper_client_port }}"
+  roles:
+    - { role: mesos }
+  tags: mesos
+

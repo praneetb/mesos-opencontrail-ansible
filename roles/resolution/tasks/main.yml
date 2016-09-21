@@ -1,0 +1,14 @@
+---
+
+- name: Set hostname
+  hostname:
+  args:
+    name: "{{ inventory_hostname }}"
+
+- name: Add entries to /etc/hosts
+  lineinfile:
+  args:
+    dest: /etc/hosts
+    regexp: " {{ item }}"
+    line: "{{ hostvars[item].ansible_ssh_host }} {{ item }}"
+  with_items: "{{ groups['all'] }}"

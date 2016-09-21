@@ -1,0 +1,9 @@
+---
+
+- name: Install opencontrail
+  hosts: contrail
+  become: yes
+  roles:
+    - { role: contrail-3  }
+  tags:
+    - contrail

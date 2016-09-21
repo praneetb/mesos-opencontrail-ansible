@@ -1,0 +1,11 @@
+---
+
+- name: Marathon
+  hosts: marathon
+  vars:
+    marathon_zookeeper_hostnames: "{{ groups.marathon | join(':' + zookeeper_client_port + ',') }}:{{ zookeeper_client_port }}"
+    mesos_zookeeper_hostnames: "{{ groups.masters | join(':' + zookeeper_client_port + ',') }}:{{ zookeeper_client_port }}"
+  become: yes
+  roles:
+    - { role: marathon }
+  tags: marathon

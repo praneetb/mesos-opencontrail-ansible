@@ -27,6 +27,8 @@
 - name: Remove Default Mesos-Slave Config
   file: state=absent path=/etc/mesos-slave/
 
+- debug: msg="ZK={{ mesos_zookeeper_hostnames }}"
+
 # == Configure and recreate
 - name: Mesos default config file
   template: src=conf-mesos.j2 dest=/etc/default/mesos
