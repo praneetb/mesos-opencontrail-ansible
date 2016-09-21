@@ -23,7 +23,6 @@
   hosts: cluster
   become: yes
   roles:
-    - pre-ansible
     - common
     - docker
   tags:

@@ -8,6 +8,15 @@
 - include: generic-install.yml
   when: ansible_distribution != "Debian" and ansible_distribution != "Ubuntu"
 
+- name: Set docker config file directory
+  set_fact:
+    docker_config_dir: "/etc/sysconfig"
+
+- name: Override docker config file directory for Debian
+  set_fact:
+    docker_config_dir: "/etc/default"
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
 #
 # systemd service configuration uses EnvironmentFile (docker and docker-network)
 # upstart service configuration sources docker_config_dir / docker
