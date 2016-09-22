@@ -1,6 +1,6 @@
 description "OpenContrail control-node"
 
-start on started ifmap-server
+start on started docker
 stop on runlevel [!2345]
 
 respawn
