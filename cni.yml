@@ -1,0 +1,9 @@
+---
+
+- name: Mesos
+  hosts: nodes
+  become: yes
+  roles:
+    - { role: cni }
+  tags: cni
+

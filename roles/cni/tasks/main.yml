@@ -47,9 +47,13 @@
     - "{{ go_gopath }}/src/cni-opencontrail-plugin/contrail_cli.py"
 
 - name: Copy cni configs
-  template: src="{{ item }}.j2" dest="{{ mesos_cni_config_dir }}/{{ item }}"
+  template:
+  args:
+    src: "{{ item }}.j2"
+    dest: "{{ mesos_cni_config_dir }}/{{ item }}"
   with_items:
     - cni-opencontrail-plugin.conf
     - cni-bridge-plugin.conf
-  notify:
-    - Restart mesos-slave
+
+- name: Restart mesos-slave
+  service: name=mesos-slave state=restarted

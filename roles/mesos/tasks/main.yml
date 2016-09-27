@@ -19,7 +19,3 @@
 
 - include: mesos.yml
 
-- include: cni-plugins.yml
-  when: mesos_install_mode == "slave"
-  tags:
-    - cni

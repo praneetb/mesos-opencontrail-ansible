@@ -2,8 +2,6 @@
 mesos_playbook_version: "0.3.5-kr"
 slave_hook_module_path: /usr/local/lib/mesos/modules
 slave_modules_json_path: /var/mesos
-mesos_cni_config_dir: /var/lib/mesos/cni/config
-mesos_cni_plugins_dir: /var/lib/mesos/cni/plugins
 mesos_containerizers: "mesos"
 mesos_isolation: "filesystem/linux,docker/runtime"
 mesos_image_providers: "docker"
