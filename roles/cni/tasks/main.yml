@@ -5,6 +5,9 @@
 
 - include_vars: golang.yml
 
+- name: Create /var/run/netns dir
+  file: path=/var/run/netns state=directory
+
 - name: Download cni repo
   git:
   args:
