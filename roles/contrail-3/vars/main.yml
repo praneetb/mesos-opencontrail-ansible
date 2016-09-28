@@ -14,5 +14,4 @@ python_backports_ssl_package: "http://ftp.pl.debian.org/debian/pool/main/b/backp
 python_certifi_package: "https://launchpad.net/~chris-lea/+archive/ubuntu/python-requests/+build/5495054/+files/python-certifi_1.0.0-1chl1~raring1_all.deb"
 python_pycassa_package: "http://launchpadlibrarian.net/174108584/python-pycassa_1.11.0-1_all.deb"
 python_thrift_package: "http://ftp.pl.debian.org/debian/pool/main/p/python-thrift/python-thrift_0.9.1-2_amd64.deb"
-vrouter_ctl_path: /tmp/vrouter_ctl.py
-vrouter_ctl_url: https://raw.githubusercontent.com/pedro-r-marques/packnet/master/scripts/vrouter-ctl/vrouter_ctl/vrouter_ctl.py
+contrail_cli_path: /contrail_cli.py

@@ -1,8 +1,5 @@
 ---
 
-- name: Download vrouter_ctl
-  get_url: url="{{ vrouter_ctl_url }}" dest="{{ vrouter_ctl_path }}"
-
 - name: VRouter agent upstart
   template:
     src: contrail-vrouter-agent.upstart.j2

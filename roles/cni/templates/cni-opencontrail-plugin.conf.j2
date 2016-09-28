@@ -3,16 +3,16 @@
 	"type": "cni-opencontrail-plugin",
 	"opencontrail_server": "{{ groups['masters'][0] }}",
 	"opencontrail_port": 8082,
+	"vrouter_port": 9090,
 	"public_subnet": "{{ contrail_public_subnet }}",
 	"private_subnet": "{{ contrail_private_subnet }}",
 	"service_subnet": "{{ contrail_service_subnet }}",
-	"contrail_cli_cmd": "python",
+	"contrail_cli_cmd": "docker",
 	"contrail_cli_args": [
-		"{{ mesos_cni_plugins_dir }}/contrail_cli.py"
-	],
-	"vrouter_ctl_cmd": "docker",
-	"vrouter_ctl_args": [
-		"exec", "contrail-vrouter-agent", "python", "/vrouter_ctl.py"
+		"exec",
+		"contrail-vrouter-agent",
+		"python",
+		"/contrail_cli.py"
 	],
 	"ipam": {
 		"type": "host-local",

@@ -26,6 +26,7 @@
     repo: "https://github.com/codilime/cni-opencontrail-plugin.git"
     dest: "{{ go_gopath }}/src/cni-opencontrail-plugin"
     force: yes
+    version: master
 
 - name: Build cni-opencontrail-plugin
   shell: . {{ go_profile_entry }}; go get && go build cni-opencontrail-plugin.go
@@ -40,6 +41,8 @@
   with_items:
     - "{{mesos_cni_config_dir}}"
     - "{{mesos_cni_plugins_dir}}"
+  tags:
+    - cni-configs
 
 - name: Install plugins
   shell: mv "{{ item }}" "{{ mesos_cni_plugins_dir }}"
@@ -47,6 +50,10 @@
     - "{{ go_gopath }}/src/cni/bin/bridge"
     - "{{ go_gopath }}/src/cni/bin/host-local"
     - "{{ go_gopath }}/src/cni-opencontrail-plugin/cni-opencontrail-plugin"
+
+- name: Install contrail_cli
+  shell: mv "{{ item }}" "/"
+  with_items:
     - "{{ go_gopath }}/src/cni-opencontrail-plugin/contrail_cli.py"
 
 - name: Copy cni configs
@@ -57,6 +64,10 @@
   with_items:
     - cni-opencontrail-plugin.conf
     - cni-bridge-plugin.conf
+  tags:
+    - cni-configs
 
 - name: Restart mesos-slave
   service: name=mesos-slave state=restarted
+  tags:
+    - cni-configs
