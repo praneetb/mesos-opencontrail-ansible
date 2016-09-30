@@ -28,6 +28,14 @@
     force: yes
     version: "{{ cni_opencontrail_plugin_version }}"
 
+- name: call go get for cni-opencontrail-plugin
+  shell: . {{ go_profile_entry }}; go get
+  args:
+    chdir: "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/{{ item }}"
+  with_items:
+    - "plugins/main/"
+    - "plugins/ipam/"
+
 - name: Build cni-opencontrail-plugin
   shell: . {{ go_profile_entry }}; go build "{{ item }}"
   args:
