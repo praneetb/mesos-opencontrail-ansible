@@ -59,6 +59,7 @@
   shell: mv "{{ item }}" "{{ mesos_cni_plugins_dir }}"
   with_items:
     - "{{ go_gopath }}/src/github.com/containernetworking/cni/bin/bridge"
+    - "{{ go_gopath }}/src/github.com/containernetworking/cni/bin/host-local"
     - "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/cni_opencontrail_plugin"
     - "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/cni_opencontrail_ipam"
 
