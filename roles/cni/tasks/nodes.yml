@@ -11,9 +11,6 @@
     src: opencontrail_hook_module_config.json.j2
     dest: "{{ mesos_modules_config_dir }}/opencontrail_hook_module_config.json"
 
-- name: Copy hook module source file
-  copy: src=opencontrail_hook_module.cpp dest=/tmp/
-
 - name: Add protobub repo
   apt_repository: repo="ppa:5-james-t/protobuf-ppa"
 
@@ -30,7 +27,7 @@
 - name: Compile hook module
   shell: "{{ item }}"
   args:
-    chdir: /tmp
+    chdir: "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin"
   with_items:
     - g++ -c -lmesos -std=c++11 -fpic -o opencontrail_hook_module.o opencontrail_hook_module.cpp
     - gcc -shared -o "{{ mesos_modules_libs_dir }}/libopencontrailhookmodule.so" opencontrail_hook_module.o
