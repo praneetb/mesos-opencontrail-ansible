@@ -1,0 +1,121 @@
+---
+
+- name: Install golang
+  include: golang.yml
+
+- include_vars: golang.yml
+
+- name: Copy hook module config
+  template:
+  args:
+    src: opencontrail_hook_module_config.json.j2
+    dest: "{{ mesos_modules_config_dir }}/opencontrail_hook_module_config.json"
+
+- name: Copy hook module source file
+  copy: src=opencontrail_hook_module.cpp dest=/tmp/
+
+- name: Add protobub repo
+  apt_repository: repo="ppa:5-james-t/protobuf-ppa"
+
+- name: Install hook module dependencies
+  apt:
+  args:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - libboost-dev
+    - libprotobuf-dev
+    - libgoogle-glog-dev
+
+- name: Compile hook module
+  shell: "{{ item }}"
+  args:
+    chdir: /tmp
+  with_items:
+    - g++ -c -lmesos -std=c++11 -fpic -o opencontrail_hook_module.o opencontrail_hook_module.cpp
+    - gcc -shared -o "{{ mesos_modules_libs_dir }}/libopencontrailhookmodule.so" opencontrail_hook_module.o
+
+- name: Create /var/run/netns dir
+  file: path=/var/run/netns state=directory
+
+- name: Download cni repo
+  git:
+  args:
+    repo: "https://github.com/containernetworking/cni.git"
+    dest: "{{ go_gopath }}/src/github.com/containernetworking/cni"
+    force: yes
+
+- name: Build cni plugins
+  shell: . {{ go_profile_entry }}; ./build
+  args:
+    chdir: "{{ go_gopath }}/src/github.com/containernetworking/cni"
+
+- name: Download cni-opencontrail-plugin repo
+  git:
+  args:
+    repo: "https://github.com/codilime/cni-opencontrail-plugin.git"
+    dest: "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin"
+    force: yes
+    version: "{{ cni_opencontrail_plugin_version }}"
+
+- name: call go get for cni-opencontrail-plugin
+  shell: . {{ go_profile_entry }}; go get
+  args:
+    chdir: "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/{{ item }}"
+  with_items:
+    - "plugins/main/"
+    - "plugins/ipam/"
+
+- name: Build cni-opencontrail-plugin
+  shell: . {{ go_profile_entry }}; go build "{{ item }}"
+  args:
+    chdir: "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin"
+  with_items:
+    - "plugins/main/cni_opencontrail_plugin.go"
+    - "plugins/ipam/cni_opencontrail_ipam.go"
+
+- name: Create cni dirs
+  file:
+  args:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{mesos_cni_config_dir}}"
+    - "{{mesos_cni_plugins_dir}}"
+  tags:
+    - cni-configs
+
+- name: Install plugins
+  shell: mv "{{ item }}" "{{ mesos_cni_plugins_dir }}"
+  with_items:
+    - "{{ go_gopath }}/src/github.com/containernetworking/cni/bin/bridge"
+    - "{{ go_gopath }}/src/github.com/containernetworking/cni/bin/host-local"
+    - "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/cni_opencontrail_plugin"
+    - "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/cni_opencontrail_ipam"
+
+- name: Install contrail_cli
+  shell: docker cp "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/contrail_cli.py" contrail-vrouter-agent:/
+
+- name: Copy cni configs
+  template:
+  args:
+    src: "{{ item }}.j2"
+    dest: "{{ mesos_cni_config_dir }}/{{ item }}"
+  with_items:
+    - cni-opencontrail-plugin.conf
+    - cni-bridge-plugin.conf
+  tags:
+    - cni-configs
+
+- name: Add OpenContrailHookModule to Mesos Agent hooks option
+  lineinfile:
+    dest: /etc/default/mesos-slave
+    line: "{{ item }}"
+  with_items:
+    - export MESOS_HOOKS=${MESOS_HOOKS+$MESOS_HOOKS,}OpenContrailHookModule
+    - export MESOS_HTTP_COMMAND_EXECUTOR=1
+
+- name: Restart mesos-slave
+  service: name=mesos-slave state=restarted
+  tags:
+    - cni-configs

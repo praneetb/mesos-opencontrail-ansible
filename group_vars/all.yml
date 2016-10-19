@@ -16,5 +16,9 @@ private_file_server_user: ubuntu
 # hosts that nodes should know to avoid fingerprint checking
 tmp_known_hosts_file: "tmp_known_hosts_file"
 
+mesos_master_port: "5050"
+mesos_slave_port: "5051"
 mesos_cni_config_dir: /var/lib/mesos/cni/config
 mesos_cni_plugins_dir: /var/lib/mesos/cni/plugins
+mesos_modules_config_dir: /var/lib/mesos/modules/config
+mesos_modules_libs_dir: /var/lib/mesos/modules/libs

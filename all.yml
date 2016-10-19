@@ -4,9 +4,9 @@
  
 - include: mesos.yml
 
-- include: cni.yml
-
 - include: opencontrail.yml
+
+- include: cni.yml
 
 - include: marathon.yml
 

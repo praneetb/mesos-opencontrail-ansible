@@ -1,0 +1,22 @@
+{
+	"libraries": [
+		{
+			"file": "{{ mesos_modules_libs_dir }}/libopencontrailhookmodule.so",
+			"modules": [
+				{
+					"name": "OpenContrailHookModule",
+					"parameters": [
+             					{
+               						"key": "ip",
+               						"value": "{{ mesos_agent_linklocal_ip }}"
+             					},
+             					{
+               						"key": "port",
+               						"value": "{{ mesos_agent_linklocal_port }}"
+             					}
+           				]
+				}
+			]
+		}
+	]
+}

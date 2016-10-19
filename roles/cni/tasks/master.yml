@@ -1,0 +1,12 @@
+---
+
+- name: Configure link local service Mesos Agent
+  command: >
+    docker exec contrail-control /usr/share/contrail-utils/provision_linklocal.py
+    --api_server_ip localhost --api_server_port 8082
+    --linklocal_service_name mesos_agent
+    --linklocal_service_ip "{{ mesos_agent_linklocal_ip }}"
+    --linklocal_service_port "{{ mesos_agent_linklocal_port }}"
+    --ipfabric_service_ip "127.0.0.1"
+    --ipfabric_service_port "{{ mesos_slave_port }}"
+    --oper add

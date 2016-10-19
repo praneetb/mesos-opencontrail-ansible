@@ -17,7 +17,7 @@
 - name: Create work dir
   file: path={{ mesos_work_dir }} state=directory
 
-- name: Create cni dirs
+- name: Create dirs
   file:
   args:
     path: "{{ item }}"
@@ -25,6 +25,8 @@
   with_items:
     - "{{ mesos_cni_config_dir }}"
     - "{{ mesos_cni_plugins_dir }}"
+    - "{{ mesos_modules_config_dir }}"
+    - "{{ mesos_modules_libs_dir }}"
   when: mesos_install_mode == "slave"
 
 # == Remove default configs

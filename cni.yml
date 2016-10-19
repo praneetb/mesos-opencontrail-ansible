@@ -1,9 +1,19 @@
 ---
 
-- name: Mesos
+- name: CNI tasks on nodes
   hosts: nodes
   become: yes
   roles:
     - { role: cni }
+  vars:
+    node_type: "node"
   tags: cni
 
+- name: CNI tasks on master
+  hosts: masters
+  become: yes
+  roles:
+    - { role: cni }
+  vars:
+    node_type: "master"
+  tags: cni
