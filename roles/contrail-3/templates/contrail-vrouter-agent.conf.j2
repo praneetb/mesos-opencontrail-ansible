@@ -1,5 +1,3 @@
-
-
 #
 # Vnswad configuration options
 #
@@ -75,8 +73,6 @@ log_local=1
 # xmpp_ca_cert=/etc/contrail/ssl/certs/ca-cert.pem
 
 [DISCOVERY]
-server = {{ contrail_master_host_addresses }}
-max_control_nodes = 3
 #If DEFAULT.collectors and/or CONTROL-NODE and/or DNS is not specified this
 #section is mandatory. Else this section is optional
 
@@ -101,8 +97,7 @@ max_control_nodes = 3
 # Everything in this section is optional
 
 # Hypervisor type. Possible values are kvm, xen and vmware
-
-type= {{ contrail_hypervisor_type }}
+type={{ contrail_hypervisor_type }}
 
 # Link-local IP address and prefix in ip/prefix_len format (for xen)
 # xen_ll_ip=
@@ -154,18 +149,12 @@ type= {{ contrail_hypervisor_type }}
 # metadata_proxy_port=
 
 [NETWORKS]
-control_network_ip = {{ contrail_host_address }}
 # control-channel IP address used by WEB-UI to connect to vnswad to fetch
 # required information (Optional)
 # control_network_ip=
 
 [VIRTUAL-HOST-INTERFACE]
-name = vhost0
-ip = {{ contrail_host_address }}/{{ contrail_host_prefixlen }}
-gateway = {{ contrail_host_gateway }}
-physical_interface = {{ contrail_host_interface }}
 # Everything in this section is mandatory
-
 
 # name of virtual host interface
 # name=vhost0
@@ -248,11 +237,3 @@ docker_command=/usr/bin/opencontrail-vrouter-docker
 [SERVICES]
 # bgp_as_a_service_port_range - reserving set of ports to be used.
 # bgp_as_a_service_port_range=30000-35000
-
-
-[DEFAULTS]
-platform = default
-log_file = /var/log/contrail/contrail-vrouter-agent.log
-log_level = SYS_NOTICE
-log_local = 1
-physical_interface_mac =
