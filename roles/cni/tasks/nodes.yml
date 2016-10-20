@@ -24,14 +24,6 @@
     - libprotobuf-dev
     - libgoogle-glog-dev
 
-- name: Compile hook module
-  shell: "{{ item }}"
-  args:
-    chdir: "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin"
-  with_items:
-    - g++ -c -lmesos -std=c++11 -fpic -o opencontrail_hook_module.o opencontrail_hook_module.cpp
-    - gcc -shared -o "{{ mesos_modules_libs_dir }}/libopencontrailhookmodule.so" opencontrail_hook_module.o
-
 - name: Create /var/run/netns dir
   file: path=/var/run/netns state=directory
 
@@ -54,6 +46,14 @@
     dest: "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin"
     force: yes
     version: "{{ cni_opencontrail_plugin_version }}"
+
+- name: Compile hook module
+  shell: "{{ item }}"
+  args:
+    chdir: "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin"
+  with_items:
+    - g++ -c -lmesos -std=c++11 -fpic -o opencontrail_hook_module.o opencontrail_hook_module.cpp
+    - gcc -shared -o "{{ mesos_modules_libs_dir }}/libopencontrailhookmodule.so" opencontrail_hook_module.o
 
 - name: call go get for cni-opencontrail-plugin
   shell: . {{ go_profile_entry }}; go get
