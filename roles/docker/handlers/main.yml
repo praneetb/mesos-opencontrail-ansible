@@ -9,7 +9,7 @@
 - name: start docker
   command: /bin/true
   notify:
-    - docker graph driver
+#    - docker graph driver
     - docker fix start on btrfs
     - docker start service
 
@@ -21,12 +21,12 @@
   command: ip link delete docker0
   when: '"docker0" in ansible_interfaces'
 
-  # TODO: work only on default installation...
-- name: docker graph driver 
-  command: findmnt -no FSTYPE -T /var/lib/docker
-  register: docker_driver
-  ignore_errors: True
-  changed_when: false
+#   # TODO: work only on default installation...
+# - name: docker graph driver
+#   command: findmnt -no FSTYPE -T /var/lib/docker
+#   register: docker_driver
+#   ignore_errors: True
+#   changed_when: false
 
   # TODO: fail if no --selinux-enabled in 'OPTIONS'
 - name: docker fix start on btrfs
