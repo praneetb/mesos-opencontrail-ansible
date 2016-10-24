@@ -6,18 +6,21 @@
   template: src="{{ item }}.upstart.j2" dest="/etc/init/{{ item }}.conf"
   with_items:
     - zookeeper
+  ignore_errors: true
 
-- name: Docker image ids (services)
-  command: docker images -q "{{ item }}"
+- name: master services upstart files
+  template: src={{ item }}.service.j2 dest=/etc/systemd/system/{{ item }}.service
   with_items:
-    - 'mesoscloud/zookeeper:3.4.6'
-  register: image_ids
-  always_run: true
+    - zookeeper
+  ignore_errors: true
 
-- name: Pull docker images (services)
-  command: docker pull "{{ item.item }}"
-  with_items: image_ids.results
-  when: not item.stdout
+- name: reload systemd
+  command: systemctl --system daemon-reload
+
+- name: Pull zookeeper image
+  command: docker pull "{{ item }}"
+  with_items:
+    - "mesoscloud/{{ zookeeper_docker_image }}"
 
 - name: Run zookeeper
   service: name="{{ item }}" enabled=yes state=started
