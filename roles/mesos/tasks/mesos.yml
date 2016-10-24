@@ -1,18 +1,5 @@
 ---
 
-- name: Install pip
-  package:
-  args:
-    name: "{{ item }}"
-    state: latest
-    force: yes
-  with_items:
-    - python-pip
-
-- name: Upgrade pip
-  pip: name=pip state=latest
-  become: yes
-
 # == Work Dir for replicated log
 - name: Create work dir
   file: path={{ mesos_work_dir }} state=directory

@@ -1,2 +1,11 @@
 ---
 - debug: msg="Install Mode is {{mesos_install_mode}}"
+
+- name: "Get python pip provisioning scripts"
+  get_url: dest=/tmp/get_pip.py force=yes url="https://bootstrap.pypa.io/get-pip.py"
+
+- name: "Install newest pip"
+  become: yes
+  shell: python get_pip.py
+  args:
+    chdir: /tmp

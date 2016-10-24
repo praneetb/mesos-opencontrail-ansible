@@ -15,7 +15,7 @@
   when: not mesos_install_from_package
 
 - include: mesos-install-package.yml
-  when: mesos_install_from_package and ansible_os_family == "Debian"
+  when: mesos_install_from_package
 
 - include: mesos.yml
 
