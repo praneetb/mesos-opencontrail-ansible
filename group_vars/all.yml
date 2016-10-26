@@ -5,6 +5,7 @@ contrail_service_subnet: "{{ service_subnet | default('10.64.0.0/16') }}"
 
 # External network
 contrail_public_subnet: "{{ public_subnet | default('172.18.0.0/20') }}"
+contrail_public_network: "Public"
 
 # Underlay network
 contrail_private_subnet: "{{ private_subnet | default('10.32.0.0/16') }}"

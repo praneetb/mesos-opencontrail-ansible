@@ -10,6 +10,6 @@ iface {{ item }} inet static
     up ip route add {{ contrail_service_subnet }} dev gateway1 src {{ contrail_host_address }}
 {% endif %}
     address 0.0.0.0
-    post-down vif --list | awk '/^vif.*OS: {{ item }}/ {split($1, arr, "\/"); print arr[2];}' | xargs vif --delete
+    post-down docker exec contrail-vrouter-agent sh -c "vif --list | awk '/^vif.*OS: {{ item }}/ {split($1, arr, "\/"); print arr[2];}' | xargs vif --delete"
     post-down ip link delete {{ item }}
 

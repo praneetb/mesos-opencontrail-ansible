@@ -97,7 +97,6 @@ log_local=1
 # Everything in this section is optional
 
 # Hypervisor type. Possible values are kvm, xen and vmware
-type={{ contrail_hypervisor_type }}
 
 # Link-local IP address and prefix in ip/prefix_len format (for xen)
 # xen_ll_ip=
@@ -182,6 +181,7 @@ type={{ contrail_hypervisor_type }}
 
 # We can have multiple gateway sections with different indices in the
 # following format
+
 [GATEWAY-0]
 # Name of the routing_instance for which the gateway is being configured
 # routing_instance=default-domain:admin:public:public
@@ -193,8 +193,18 @@ type={{ contrail_hypervisor_type }}
 # block is represented as ip/prefix. Multiple IP blocks are represented by
 # separating each with a space
 # ip_blocks=1.1.1.1/24
+{% if contrail_public_subnet is defined %}
+routing_instance=default-domain:default-project:{{ contrail_public_network }}:{{ contrail_public_network }}
+interface=gateway0
+ip_blocks={{ contrail_public_subnet }}
+{% endif %}
 
 [GATEWAY-1]
+routing_instance=default-domain:default-project:service-default:service-default
+interface=gateway1
+ip_blocks={{ contrail_service_subnet }}
+routes={{ contrail_host_ipaddr }}
+
 # Name of the routing_instance for which the gateway is being configured
 # routing_instance=default-domain:admin:public1:public1
 

@@ -24,15 +24,10 @@
   register: uname
 
 - name: Install linux headers
-  apt: name="linux-headers-{{ uname.stdout }}" state=latest
-
-- name: Prepare contrail-vrouter-agent configuration
-  template:
-    src: contrail-vrouter-agent.conf.j2
-    dest: /etc/contrail/contrail-vrouter-agent.conf
-    mode: 0644
-  notify:
-    - restart contrail-vrouter-agent
+  apt:
+  args:
+    name: "linux-headers-{{ uname.stdout }}"
+    state: latest
 
 - name: Start vrouter agent
   service: name=contrail-vrouter-agent enabled=yes state=started
