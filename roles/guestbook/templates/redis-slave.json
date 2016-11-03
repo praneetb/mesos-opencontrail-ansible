@@ -1,0 +1,21 @@
+{
+    "id": "redis-slave",
+    "instances": 2,
+    "container": {
+      "type": "MESOS",
+      "docker": {
+        "image": "kubernetes/redis-slave:v2"
+      } 
+    },
+    "cpus": 0.1,
+    "mem": 64.0,
+    "ipAddress": {
+        "networkName": "opencontrail",
+        "labels": {
+            "network": "redis",
+            "service": "redis-slave",
+            "service_subnet": "10.64.2.0/24",
+            "uses": "redis-master"
+        }
+    }
+}

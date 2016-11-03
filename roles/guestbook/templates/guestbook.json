@@ -1,0 +1,22 @@
+{
+    "id": "guestbook",
+    "instances": 3,
+    "container": {
+      "type": "MESOS",
+      "docker": {
+        "image": "kubernetes/guestbook:v2"
+      } 
+    },
+    "cpus": 0.1,
+    "mem": 64.0,
+    "ipAddress": {
+        "networkName": "opencontrail",
+        "labels": {
+            "network": "guestbook",
+            "service": "guestbook",
+            "service_subnet": "10.64.1.0/24",
+            "public": "guestbook",
+            "uses": "redis-master"
+        }
+    }
+}
