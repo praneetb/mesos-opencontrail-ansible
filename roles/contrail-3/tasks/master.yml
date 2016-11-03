@@ -27,3 +27,6 @@
 
 - name: Start contrail-analytics service
   service: name="contrail-analytics" enabled=yes state=started
+
+- name: Retart contrail-names service
+  command: docker exec contrail-control service contrail-named restart

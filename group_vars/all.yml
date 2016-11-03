@@ -23,3 +23,5 @@ mesos_cni_config_dir: /var/lib/mesos/cni/config
 mesos_cni_plugins_dir: /var/lib/mesos/cni/plugins
 mesos_modules_config_dir: /var/lib/mesos/modules/config
 mesos_modules_libs_dir: /var/lib/mesos/modules/libs
+
+dns_domain: juniper.net
