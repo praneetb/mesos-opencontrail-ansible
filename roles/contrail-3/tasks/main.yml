@@ -17,19 +17,24 @@
       - contrail_host_gateway is defined
 
 - name: Create log dir
-  file: path="{{ contrail_log_dir }}" state=directory mode=0777
+  file:
+  args:
+    path: "{{ contrail_log_dir }}"
+    state: directory
+    mode: 0777
 
 - name: Install contrail-python
   include: contrail-python.yml
 
 - name: Install compute nodes
-  include: vrouter.yml
+  include: "{{ item }}"
+  with_items:
+    - nodes.yml
   when: inventory_hostname in groups['nodes']
 
 - name: Install gateways
   include: "{{ item }}"
   with_items:
-    - vrouter.yml
     - gateway.yml
   when: "'gateways' in groups and inventory_hostname in groups['gateways']"
 

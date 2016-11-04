@@ -84,11 +84,13 @@
 
 - name: Install plugins
   shell: mv "{{ item }}" "{{ mesos_cni_plugins_dir }}"
+  args:
+    chdir: "{{ go_gopath }}"
   with_items:
-    - "{{ go_gopath }}/src/github.com/containernetworking/cni/bin/bridge"
-    - "{{ go_gopath }}/src/github.com/containernetworking/cni/bin/host-local"
-    - "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/cni_opencontrail_plugin"
-    - "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/cni_opencontrail_ipam"
+    - "src/github.com/containernetworking/cni/bin/bridge"
+    - "src/github.com/containernetworking/cni/bin/host-local"
+    - "src/github.com/codilime/cni-opencontrail-plugin/cni_opencontrail_plugin"
+    - "src/github.com/codilime/cni-opencontrail-plugin/cni_opencontrail_ipam"
 
 - name: Install contrail_cli
   shell: docker cp "{{ go_gopath }}/src/github.com/codilime/cni-opencontrail-plugin/contrail_cli.py" contrail-vrouter-agent:/

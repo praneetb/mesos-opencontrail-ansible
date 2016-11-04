@@ -1,0 +1,20 @@
+{
+    "id": "redis-master",
+    "instances": 1,
+    "container": {
+      "type": "MESOS",
+      "docker": {
+        "image": "redis"
+      } 
+    },
+    "cpus": 0.1,
+    "mem": 64.0,
+    "ipAddress": {
+        "networkName": "opencontrail",
+        "labels": {
+            "network": "redis",
+            "service": "redis-master",
+            "service_subnet": "10.64.0.0/24"
+        }
+    }
+}

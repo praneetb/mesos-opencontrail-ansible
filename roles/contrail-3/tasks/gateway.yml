@@ -1,10 +1,27 @@
 ---
 
+- name: Prepare contrail-vrouter-agent configuration
+  template:
+    src: contrail-vrouter-agent.gateway.conf.j2
+    dest: /etc/contrail/contrail-vrouter-agent.conf
+    mode: 0644
+  notify:
+    - restart contrail-vrouter-agent
+
+- include: vrouter.yml
+
 - name: Interface configuration file
   template: src=gateway.cfg.j2 dest=/etc/network/interfaces.d/{{ item }}.cfg
   with_items:
     - gateway0
     - gateway1
+
+- name: Wait for vRouter
+  wait_for:
+  args:
+    port: "{{ contrail_vrouter_port }}"
+    delay: 10
+    timeout: 1200
 
 - name: Activate gateway0
   command: ifup gateway0

@@ -1,0 +1,8 @@
+---
+
+- name: Guestbook example
+  hosts: masters
+  become: yes
+  roles:
+    - { role: guestbook }
+  tags: guestbook

@@ -10,13 +10,13 @@
 - name: Docker image ids (services)
   command: docker images -q "{{ item }}"
   with_items:
-    - 'mesoscloud/zookeeper:3.4.6'
+    - mesoscloud/zookeeper:3.4.6
   register: image_ids
   always_run: true
 
 - name: Pull docker images (services)
   command: docker pull "{{ item.item }}"
-  with_items: image_ids.results
+  with_items: "{{ image_ids.results }}"
   when: not item.stdout
 
 - name: Run zookeeper

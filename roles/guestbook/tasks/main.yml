@@ -1,0 +1,18 @@
+---
+
+- name: Copy marathon tasks
+  template:
+  args:
+    src: "{{ item }}"
+    dest: "/"
+  with_items:
+    - redis-master.json
+    - redis-slave.json
+    - guestbook.json
+
+- name: Start tasks
+  shell: "curl -H 'Content-Type: application/json' -X POST localhost:8880/v2/apps -d@{{ item }}; sleep 5"
+  with_items:
+    - /redis-master.json
+    - /redis-slave.json
+    - /guestbook.json

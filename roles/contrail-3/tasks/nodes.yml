@@ -1,0 +1,11 @@
+---
+
+- name: Prepare contrail-vrouter-agent configuration
+  template:
+    src: contrail-vrouter-agent.node.conf.j2
+    dest: /etc/contrail/contrail-vrouter-agent.conf
+    mode: 0644
+  notify:
+    - restart contrail-vrouter-agent
+
+- include: vrouter.yml
