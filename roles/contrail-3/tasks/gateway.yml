@@ -16,6 +16,13 @@
     - gateway0
     - gateway1
 
+- name: Wait for vRouter
+  wait_for:
+  args:
+    port: "{{ contrail_vrouter_port }}"
+    delay: 10
+    timeout: 1200
+
 - name: Activate gateway0
   command: ifup gateway0
 

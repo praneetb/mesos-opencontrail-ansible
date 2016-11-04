@@ -1,11 +1,13 @@
 # Must be a string due to usage in concatenation with other stings
-zookeeper_client_port: "2181"
+zookeeper_client_port: 2181
 
 contrail_service_subnet: "{{ service_subnet | default('10.64.0.0/16') }}"
 
 # External network
 contrail_public_subnet: "{{ public_subnet | default('172.18.0.0/20') }}"
 contrail_public_network: "Public"
+contrail_vrouter_port: 9090
+contrail_control_api_port: 8082
 
 # Underlay network
 contrail_private_subnet: "{{ private_subnet | default('10.32.0.0/16') }}"
@@ -17,8 +19,8 @@ private_file_server_user: ubuntu
 # hosts that nodes should know to avoid fingerprint checking
 tmp_known_hosts_file: "tmp_known_hosts_file"
 
-mesos_master_port: "5050"
-mesos_slave_port: "5051"
+mesos_master_port: 5050
+mesos_slave_port: 5051
 mesos_cni_config_dir: /var/lib/mesos/cni/config
 mesos_cni_plugins_dir: /var/lib/mesos/cni/plugins
 mesos_modules_config_dir: /var/lib/mesos/modules/config

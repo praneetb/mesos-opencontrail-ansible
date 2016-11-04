@@ -28,5 +28,17 @@
 - name: Start contrail-analytics service
   service: name="contrail-analytics" enabled=yes state=started
 
+- name: Wait for contrail-api
+  wait_for:
+  args:
+    port: "{{ contrail_control_api_port }}"
+    delay: 10
+
+- name: Wait for contrail-dns
+  wait_for:
+  args:
+    port: 8092
+    delay: 10
+
 - name: Retart contrail-names service
   command: docker exec contrail-control service contrail-named restart
